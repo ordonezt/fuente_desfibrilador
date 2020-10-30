@@ -1,3 +1,5 @@
+#include "comunicacion.h"
+
 //Enumeracion de estados de la maquina
 typedef enum{
   RESET,
@@ -7,8 +9,8 @@ typedef enum{
   DESCARGANDO,
 }estado_t;
 
-#define TIMEOUT_CARGADO   5000
-#define TIMEOUT_CARGA     10000
+#define TIMEOUT_CARGADO   20000
+#define TIMEOUT_CARGA     20000
 
 void maquina_de_estados(void);
 
@@ -17,10 +19,10 @@ void transicion_cargado(estado_t *estado);
 void transicion_descargar(estado_t *estado);
 void transicion_reposo(estado_t *estado);
 
-bool condicion_cargar(void);
-bool condicion_cargado(void);
-bool condicion_descargar(void);
-bool condicion_reposo(void);
+bool condicion_cargar(uart_comandos_t comando);
+bool condicion_cargado(uart_comandos_t comando);
+bool condicion_descargar(uart_comandos_t comando);
+bool condicion_reposo(uart_comandos_t comando);
 
 void accion_cargar(void);
 void accion_cargado(void);

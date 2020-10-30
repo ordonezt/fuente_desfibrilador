@@ -1,8 +1,15 @@
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef COMUNICACION_H
+#define COMUNICACION_H
+
 /*######## PARAMETROS DE LA UART ########*/
 //Velocidad de la comunicacion
 #define BAUDRATE  9600
 //Velocidad de transmicion a PC
 #define MILLIS_TRANSMITIR 300
+#define TIMEOUT_UART      6000
+
+#define LONGITUD_COMANDO  5
 
 //Enumeracion de estados de la recepcion de la UART
 typedef enum{
@@ -21,3 +28,5 @@ typedef enum{
 void maquinaUart(char caracter);
 void comunicacion_PC(char id[]);
 void comunicacion_inicializar(void);
+
+#endif /* COMUNICACION_H */

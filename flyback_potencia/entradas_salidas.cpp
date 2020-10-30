@@ -2,6 +2,8 @@
 #include "entradas_salidas.h"
 #include "timers.h"
 
+uint16_t corriente = CORRIENTE_LIMITE_DEFAULT;
+
 void abrir_rele(void)
 {
   digitalWrite(DESCARGA, HIGH);
@@ -35,6 +37,18 @@ void heartbeat(char id[])
    timer_configurar(MILLIS_HEARTBEAT, false, id, heartbeat);
 }
 
+void corriente_limite(uint16_t corriente_limite)
+{
+  uint8_t duty;
+  
+  corriente_limite = corriente_limite < CORRIENTE_MAXIMA? corriente_limite : CORRIENTE_MAXIMA;
+
+  duty = (CORRIENTE_OFFSET - CORRIENTE_GANANCIA * corriente) * CORRIENTE_RESOLUCION / CORRIENTE_VREF;
+  
+//  duty = ((float)corriente_limite / CORRIENTE_MAXIMA) * 255;
+  
+  analogWrite(PWM, duty);
+}
 void entradas_salidas_inicializar(void)
 {
   pinMode(CORTE, OUTPUT);
@@ -43,4 +57,5 @@ void entradas_salidas_inicializar(void)
   pinMode(LED, OUTPUT);
 
   timer_agregar(MILLIS_HEARTBEAT, false, "heart", heartbeat);
+  corriente_limite(corriente);
 }

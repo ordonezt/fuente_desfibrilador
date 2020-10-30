@@ -16,4 +16,8 @@
 /*######## TENSION DE SEGURIDAD ########*/
 #define TENSION_PELIGROSA_MINIMA  20//V
 
+#define TENSION_MAXIMA    2500//V
+#define HISTERESIS_MAXIMA 100//V
+
+
 void medicion_inicializar(void);

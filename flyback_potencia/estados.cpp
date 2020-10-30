@@ -16,36 +16,39 @@ void maquina_de_estados(void)
   //Estado de la maquina (global)
   static estado_t estado = RESET;
   
+  uart_comandos_t comando_aux = uart_comando;
+  uart_comando = NADA;
+  
   estado_debug = estado * 256;
   
   switch(estado)
   {
     case REPOSO:
       accion_reposo();
-      if(condicion_cargar() == true)
+      if(condicion_cargar(comando_aux) == true)
         transicion_cargar(&estado);
         
       break;
       
     case CARGANDO:
       accion_cargar();
-      if(condicion_cargado() == true)
+      if(condicion_cargado(comando_aux) == true)
         transicion_cargado(&estado);
-      else if(condicion_descargar() == true)
+      else if(condicion_descargar(comando_aux) == true)
         transicion_descargar(&estado);
         
       break;
     
     case CARGADO:
       accion_cargado();
-      if(condicion_descargar() == true)
+      if(condicion_descargar(comando_aux) == true)
         transicion_descargar(&estado);
         
       break;
       
     case DESCARGANDO:
       accion_descargar();
-      if(condicion_reposo() == true)
+      if(condicion_reposo(comando_aux) == true)
         transicion_reposo(&estado);
       break;
     
@@ -84,14 +87,9 @@ void accion_cargar(void)
   }
 }
 
-bool condicion_cargar(void)
+bool condicion_cargar(uart_comandos_t comando)
 {
-  bool retorno;
-  
-  retorno = (uart_comando == CARGAR)? true : false;
-  uart_comando = NADA;
-  
-  return retorno;
+  return comando == CARGAR;
 }
 
 /*######### ESTADO CARGADO ##############*/
@@ -99,7 +97,7 @@ void transicion_cargado(estado_t *estado)
 {
   timer_configurar(TIMEOUT_CARGADO, false, "tmout", timeout);
   *estado = CARGADO;
-//  Serial.print("Estado:"); Serial.print(*estado); Serial.print("\n");
+//  Serial.print("Tension de corte: "); Serial.print(tension_capacitor); Serial.print("\n");Serial.print("\n");Serial.print("\n");
 }
 
 void accion_cargado(void)
@@ -108,7 +106,7 @@ void accion_cargado(void)
   abrir_rele();
 }
 
-bool condicion_cargado(void)
+bool condicion_cargado(uart_comandos_t comando)
 {
   return (tension_capacitor > (tension_final - histeresis)) && (tension_capacitor < (tension_final + histeresis));
 }
@@ -127,12 +125,11 @@ void accion_descargar(void)
   cerrar_rele();
 }
 
-bool condicion_descargar(void)
+bool condicion_descargar(uart_comandos_t comando)
 {
   bool condicion_uart, condicion_tiempo_limite;
-
-  condicion_uart = (uart_comando == DESCARGAR)? true : false;
-  uart_comando = NADA;
+  
+  condicion_uart = comando == DESCARGAR;
 
   condicion_tiempo_limite = flag_tiempo_cumplido;
   flag_tiempo_cumplido = false;
@@ -152,7 +149,7 @@ void accion_reposo(void)
   cerrar_rele();
 }
 
-bool condicion_reposo(void)
+bool condicion_reposo(uart_comandos_t comando)
 {
   return tension_capacitor < TENSION_PELIGROSA_MINIMA;
 }
